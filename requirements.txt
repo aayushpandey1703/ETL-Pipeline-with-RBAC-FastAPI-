@@ -1,0 +1,8 @@
+fastapi[standard]
+uvicorn
+sqlalchemy[asyncio]
+aiosqlite
+passlib
+bcrypt==4.0.1
+python-jose
+dotenv
