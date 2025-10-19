@@ -119,4 +119,4 @@ GET	/etl/status	Check ETL task status	admin
 
 ### Each user has one or multiple roles.
 ### Roles define permissions for API endpoints.
-### Middleware dependency required_role_check(roles: List[str]) ensures endpoint access based on role.
+### Middleware dependency required_role_check(roles: List[str]) ensures endpoint access based on role
