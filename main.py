@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from models.database import engine,Base
 from routes.user import route
 from routes.auth import auth_router
+from routes.etl import etl_route
 
 app=FastAPI(
     title="my app",
@@ -19,4 +20,5 @@ async def create_tables():
 
 app.include_router(auth_router)
 app.include_router(route)
+app.include_router(etl_route)
 

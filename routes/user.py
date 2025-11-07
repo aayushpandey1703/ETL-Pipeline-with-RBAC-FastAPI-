@@ -25,7 +25,7 @@ async def updatedUser(db,user_data,userID):
             roles=result.scalars().all()
             if len(roles)!=len(user_data.roles):
                 raise HTTPException(status_code=404, detail="Some roles does not exists")
-
+                
             user.user_role.clear()
             print("userID")
             print(userID)
@@ -65,7 +65,7 @@ async def get_all(db:AsyncSession=Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"[get_all_users] something went wrong: {str(e)}")
 
 @route.put("/update_user/{userID}",response_model=UserResponse)
-async def update_user(userID:int,user_data:UpdateUser,db:AsyncSession=Depends(get_db)):
+async def update_user(userID:int,user_data:UpdateUser,db:AsyncSession=Depends(get_db),loggedInUser:dict=Depends(required_role_check(["admin","user"]))):
     try:
         updateUser=await updatedUser(db,user_data,userID)
         return updateUser
@@ -73,3 +73,17 @@ async def update_user(userID:int,user_data:UpdateUser,db:AsyncSession=Depends(ge
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"[Update user route] Something went wrong: {str(e)}")
+
+# delete user from user_id
+@route.delete("/delete/{user_id}",response_model=UserResponse)
+async def delete_user(user_id:int, db:AsyncSession=Depends(get_db),loggedInUser:dict=Depends(required_role_check(["admin"]))):
+    try:
+        result=await db.execute(select(User).where(User.id==user_id))
+        user=result.scalars().first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User does not exists")
+        await db.delete(user)
+        await db.commit()
+        return user
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"something went wrongs: {e}")
