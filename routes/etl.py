@@ -25,8 +25,10 @@ async def start_job(file_path,db,file_ext="csv"):
 
         # Transformationa
         print("starting transformation job...")
+        # rename columns to snake case
         df.columns=df.columns.str.lower().str.strip().str.replace(" ","_")
 
+        # extract columns with ID to drop null values subset ID columns
         a=[i for i in df.columns if "id" in i]
         for i in df.columns:
             if "id" in i:
@@ -35,12 +37,15 @@ async def start_job(file_path,db,file_ext="csv"):
         empty_df=df.dropna(subset=a)
         print(empty_df)
 
+        # Create customer DF and drop duplicates
         customer_df=df.loc[:,["customer_id","customer_name","segment","city","state","postal_code","region"]]
         customer_df.drop_duplicates(subset=["customer_id"],inplace=True)
 
+        # Create Orders DF and drop duplicates
         orders_df=df.loc[:,["order_id","order_date","ship_mode","sales","quantity","discount","profit"]]
         orders_df.drop_duplicates(subset=["order_id"],inplace=True)
 
+        # Create product DF and drop duplicates and rename sub-category column
         product_df=df.loc[:,["product_id","category","sub-category","product_name"]]
         product_df.drop_duplicates(subset=["product_id"],inplace=True)
         product_df.rename(columns={"sub-category":"sub_category"})
